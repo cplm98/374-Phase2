@@ -1,8 +1,5 @@
 LIBRARY ieee ;
 USE ieee.std_logic_1164.all ;
-use ieee.numeric_std.all;
-
-
 
 Entity select_encoder is
 port(
@@ -14,8 +11,7 @@ Rin : in std_LOGIC;
 Rout : in std_LOGIC;
 BAout : in std_LOGIC;
 sel_en_Rout : out std_LOGIC_VECTOR(15 downto 0);
-sel_en_Rin : out std_LOGIC_VECTOR(15 downto 0);
-C_sign_extended_out: out std_LOGIC_VECTOR(31 downto 0) --dont forget to add semicolon before 
+sel_en_Rin : out std_LOGIC_VECTOR(15 downto 0)
 
 --R15_out : out std_logic;
 --R14_out : out std_logic;
@@ -37,14 +33,14 @@ C_sign_extended_out: out std_LOGIC_VECTOR(31 downto 0) --dont forget to add semi
 end select_encoder;
 
 architecture structure of select_encoder is
-	component select_encoder_and
+	component se_and
 		port(
 		r : in std_logic_vector(3 downto 0);
 		Gr : in std_logic;
 		and_out : out std_logic_vector(3 downto 0));
 	end component;
 	
-	component select_encoder_or
+	component se_or
 	port(
 		ra : in std_logic_vector(3 downto 0);
 		rb : in std_logic_vector(3 downto 0);
@@ -65,25 +61,25 @@ signal decoder_out : std_LOGIC_VECTOR(15 downto 0);
 	
 begin
 -- some of these arrow things => might be wrongs
-and_gra : select_encoder_and port map(
+and_a : se_and port map(
 	r => IR_in(26 downto 23),
 	Gr => Gra,
 	and_out => ra_and_out
 );
 
-and_grb : select_encoder_and port map(
+and_b : se_and port map(
 	r => IR_in(22 downto 19),
 	Gr => Grb,
 	and_out => rb_and_out
 );
 
-and_grc : select_encoder_and port map(
+and_c : se_and port map(
 	r => IR_in(18 downto 15),
 	Gr => Grc,
 	and_out => rc_and_out
 );
 
-sel_or : select_encoder_or port map(
+sel_or : se_or port map(
 	ra => ra_and_out,
 	rb => rb_and_out,
 	rc => rc_and_out,
@@ -168,7 +164,7 @@ sel_en_Rout(0) <= decoder_out(15) and BAR;
 --R1out => decoder_out(15) and BAR;
 --R0out => decoder_out(15) and BAR;
 
-C_sign_extended_out <= std_logic_vector(resize(signed(IR_in(18 downto 0)), C_sign_extended_out'length));
+
 
 end;
 

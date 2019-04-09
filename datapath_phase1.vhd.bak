@@ -31,7 +31,7 @@ ENTITY datapath_phase1 IS
 		R0in, R1in, R2in, R3in, R4in, R5in, R6in, R7in, R8in, R9in, R10in,
 		R11in, R12in, R13in, R14in, R15in, LOin, HIin : in std_logic;
 		R0out, R1out, R2out, R3out, R4out, R5out, R6out, R7out, R8out, R9out, R10out,
-		R11out, R12out, R13out, R14out, R15out, LOout, HIout, OutPort, BAout : in std_logic;
+		R11out, R12out, R13out, R14out, R15out, LOout, HIout : in std_logic;
 		IncPC, Rd: in std_logic;
 		BusMux_inport : in std_LOGIC_VECTOR(31 downto 0);
 		MDatain  :  in std_logic_vector(31 downto 0);
@@ -63,21 +63,13 @@ COMPONENT register32
 		 Q : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
 	);
 END COMPONENT;
---
---COMPONENT r0_mod
---	PORT(r0_in : in std_logic_vector(31 downto 0);
---BA_out : in std_logic;
---r0_out : out std_logic_vector(31 downto 0)
---);
---
---end component r0_mod;
+
 component reg_file is 
 	port(
 		R0in, R1in, R2in, R3in, R4in, R5in, R6in, R7in, R8in, R9in, R10in, R11in, R12in, R13in, R14in, R15in: in std_logic;
 		BusMuxOut: in std_logic_vector(31 downto 0);
 		clock: in std_logic;
 		clear: in std_logic;
-		BAout: in std_logic;
 		R0out, R1out, R2out, R3out, R4out, R5out, R6out, R7out, R8out, R9out, R10out, R11out, R12out, R13out, R14out, R15out: out std_logic_vector (31 downto 0)
 	);
 end component reg_file;
@@ -145,15 +137,6 @@ COMPONENT regz
 	);
 END COMPONENT;
 
-component MDR_V2
-PORT(
-	busMuxOut, MDataIn			:	IN std_logic_vector(31 downto 0);
-	clr,clk,mdr_in,MDRread		:	IN std_logic;
-	output							:	OUT std_logic_vector(31 downto 0)
-);
-end component;
-
-
 COMPONENT alu
 	PORT(ctl_add : IN STD_LOGIC;
 		 ctl_sub : IN STD_LOGIC;
@@ -192,7 +175,7 @@ SIGNAL	ALUout :  STD_LOGIC_VECTOR(63 DOWNTO 0);
 SIGNAL	BusMuxOut :  STD_LOGIC_VECTOR(31 DOWNTO 0);
 SIGNAL	CSignExtended :  STD_LOGIC_VECTOR(31 DOWNTO 0);
 SIGNAL	CSignOut :  STD_LOGIC;
---SIGNAL	inPortOut :  STD_LOGIC;
+SIGNAL	inPortOut :  STD_LOGIC;
 SIGNAL	Yout :  STD_LOGIC_VECTOR(31 DOWNTO 0);
 SIGNAL	R0BusMuxIn :  STD_LOGIC_VECTOR(31 DOWNTO 0);
 SIGNAL	R1BusMuxIn :  STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -250,7 +233,7 @@ PORT MAP(R0out => R0Out,
 		 ZLout => ZLOut,
 		 PCout => PCOut,
 		 MDRout => MDROut,
-		 inPortOut => OutPort,
+		 inPortOut => inPortOut,
 		 CSignOut => CSignOut,
 		 BusMuxInHI => BusMuxIn_HI,
 		 BusMuxIninPort => BusMux_inport,
@@ -336,14 +319,14 @@ PORT MAP(clk => clk,
 		 D => BusMuxOut,
 		 Q => Yout);
 		 
-MemData: MDR_V2 port map(
-		MDRread => Rd,
+MemData: MDR port map(
+		rd => Rd,
 		Mdatain => Mdatain,
-		busMuxOut => BusMuxOut,
-		mdr_in => MDRin,
-		clk => clk,
-		clr => clr,
-		output => BusMuxIn_MDR);
+		BusMuxOut => BusMuxOut,
+		MDRin => MDRin,
+		clock => clk,
+		clear => clr,
+		BusMuxIn_MDR => BusMuxIn_MDR);
 
 b2v_HI : register32
 PORT MAP(clk => clk,
@@ -378,7 +361,6 @@ port map(
 		R14in => R14in,
 		R15in => R15in,
 		BusMuxOut => BusMuxOut,
-		BAout => BAout,
 		clock => clk,
 		clear => clr,
 		R0out => R0BusMuxIn,

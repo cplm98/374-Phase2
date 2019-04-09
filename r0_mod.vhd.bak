@@ -1,0 +1,26 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+
+Entity r0_mod_or is
+port(
+r0_in : in std_logic_vector(31 downto 0);
+BAout : in std_logic;
+r0_out : out std_logic_vector(31 downto 0)
+);
+end r0_mod_or;
+
+architecture structure of r0_mod_or is
+
+begin
+process(r0_in(31 downto 0), BAout)
+
+begin
+
+case BAout is
+
+when '0' => and_out <= r(31 downto 0);
+when others => and_out <= "0000";
+
+end case;
+end process;
+end structure;
